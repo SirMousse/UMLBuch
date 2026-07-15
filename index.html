@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grimoire der UML — Das Arkanum der Notation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --leather:#181009;
+  --leather-2:#241609;
+  --leather-3:#100a05;
+  --parchment:#ece1c2;
+  --parchment-2:#ddccA0;
+  --parchment-3:#f4ecd4;
+  --ink:#2b1c10;
+  --ink-soft:#5a4327;
+  --gold:#c9a24b;
+  --gold-bright:#eecd7c;
+  --arcane:#2f6f6a;
+  --arcane-bright:#57b3ab;
+  --seal-red:#7c2e28;
+  --seal-green:#3c6a3f;
+  --shadow-deep: 0 20px 60px rgba(0,0,0,.6);
+  --font-display:'Cinzel Decorative', serif;
+  --font-head:'Cinzel', serif;
+  --font-body:'EB Garamond', serif;
+  --font-mono:'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse at 50% -10%, #3a2513 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 110%, #2a1a0a 0%, transparent 50%),
+    var(--leather);
+  background-attachment:fixed;
+  font-family:var(--font-body);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 3px);
+  pointer-events:none;
+  z-index:0;
+}
+::selection{ background:var(--gold); color:var(--leather-3); }
+
+/* ---------- Layout ---------- */
+.grimoire-wrap{
+  position:relative;
+  max-width:1400px;
+  margin:0 auto;
+  padding:28px 20px 60px;
+}
+.masthead{
+  text-align:center;
+  margin-bottom:26px;
+  color:var(--parchment-3);
+}
+.masthead .eyebrow{
+  font-family:var(--font-mono);
+  letter-spacing:.35em;
+  font-size:11px;
+  color:var(--arcane-bright);
+  text-transform:uppercase;
+}
+.masthead h1{
+  font-family:var(--font-display);
+  font-weight:900;
+  font-size:clamp(32px,5vw,58px);
+  margin:8px 0 6px;
+  color:var(--gold-bright);
+  text-shadow:0 2px 0 #000, 0 0 30px rgba(201,162,75,.25);
+  letter-spacing:.02em;
+}
+.masthead p{
+  font-family:var(--font-body);
+  font-style:italic;
+  color:var(--parchment-2);
+  max-width:640px;
+  margin:0 auto;
+  font-size:17px;
+}
+
+.book{
+  position:relative;
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:0;
+  border-radius:6px;
+  box-shadow:var(--shadow-deep), 0 0 0 1px #000;
+  background:var(--leather-3);
+  min-height:70vh;
+}
+
+/* ---------- TOC / Register ---------- */
+.register{
+  background:
+    linear-gradient(180deg, #241609, #17100a 70%);
+  border-right:2px solid var(--leather-3);
+  padding:22px 0 22px 0;
+  border-radius:6px 0 0 6px;
+  position:relative;
+}
+.register::after{
+  content:"";
+  position:absolute; top:0; right:0; bottom:0; width:14px;
+  background:linear-gradient(90deg, transparent, rgba(0,0,0,.55));
+}
+.register-title{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:.3em;
+  color:var(--gold);
+  text-transform:uppercase;
+  padding:0 20px 14px;
+  border-bottom:1px solid rgba(201,162,75,.25);
+  margin-bottom:6px;
+}
+.toc-group{padding:10px 0;}
+.toc-group-label{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:#8a7756;
+  padding:6px 20px 4px;
+}
+.toc-btn{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  text-align:left;
+  background:transparent;
+  border:none;
+  color:var(--parchment-2);
+  font-family:var(--font-body);
+  font-size:15.5px;
+  padding:8px 20px;
+  cursor:pointer;
+  border-left:3px solid transparent;
+  transition:background .15s, color .15s, border-color .15s;
+}
+.toc-btn .num{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--arcane-bright);
+  min-width:20px;
+}
+.toc-btn:hover{ background:rgba(201,162,75,.08); color:var(--gold-bright); }
+.toc-btn.active{
+  background:rgba(201,162,75,.14);
+  color:var(--gold-bright);
+  border-left-color:var(--gold);
+}
+.toc-btn .seal{
+  margin-left:auto;
+  font-size:13px;
+  opacity:.9;
+}
+
+/* ---------- Page (parchment) ---------- */
+.page{
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(255,255,255,.35), transparent 40%),
+    radial-gradient(ellipse at 85% 100%, rgba(0,0,0,.06), transparent 40%),
+    linear-gradient(180deg, var(--parchment-3), var(--parchment));
+  border-radius:0 6px 6px 0;
+  padding:42px 52px 60px;
+  position:relative;
+  max-height:82vh;
+  overflow-y:auto;
+}
+.page::before{
+  content:"";
+  position:absolute; left:0; top:0; bottom:0; width:26px;
+  background:linear-gradient(90deg, rgba(0,0,0,.18), transparent);
+  pointer-events:none;
+}
+.chapter{ display:none; animation:pageIn .35s ease; }
+.chapter.active{ display:block; }
+@keyframes pageIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+.chapter-eyebrow{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--arcane);
+}
+.chapter h2{
+  font-family:var(--font-head);
+  font-weight:700;
+  font-size:clamp(24px,3vw,34px);
+  color:var(--ink);
+  margin:4px 0 4px;
+  border-bottom:2px solid var(--gold);
+  padding-bottom:10px;
+}
+.chapter .sub{
+  font-style:italic;
+  color:var(--ink-soft);
+  margin-bottom:22px;
+  font-size:16.5px;
+}
+.chapter h3{
+  font-family:var(--font-head);
+  font-size:20px;
+  color:var(--arcane);
+  margin:28px 0 10px;
+}
+.chapter p, .chapter li{ font-size:16.5px; line-height:1.65; }
+.chapter ul, .chapter ol{ padding-left:22px; }
+
+.dropcap::first-letter{
+  font-family:var(--font-display);
+  font-size:52px;
+  float:left;
+  line-height:0.8;
+  padding:6px 8px 0 0;
+  color:var(--gold);
+}
+
+.box{
+  border:1px solid var(--gold);
+  background:rgba(201,162,75,.08);
+  border-radius:4px;
+  padding:14px 18px;
+  margin:16px 0;
+  position:relative;
+}
+.box .label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  display:block;
+  margin-bottom:6px;
+}
+.box.why{ border-color:var(--arcane); background:rgba(47,111,106,.08); }
+.box.why .label{ color:var(--arcane); }
+.box.ihk{ border-color:var(--seal-red); background:rgba(124,46,40,.07); }
+.box.ihk .label{ color:var(--seal-red); }
+
+table.grim{
+  width:100%;
+  border-collapse:collapse;
+  margin:14px 0 22px;
+  font-size:15.5px;
+}
+table.grim th, table.grim td{
+  border:1px solid var(--parchment-2);
+  padding:8px 10px;
+  text-align:left;
+  vertical-align:top;
+}
+table.grim th{
+  background:rgba(43,28,16,.08);
+  font-family:var(--font-head);
+  font-weight:600;
+  color:var(--ink);
+}
+code, .mono{ font-family:var(--font-mono); font-size:.92em; background:rgba(43,28,16,.07); padding:1px 5px; border-radius:3px;}
+
+.svgwrap{
+  background:rgba(255,255,255,.35);
+  border:1px solid var(--parchment-2);
+  border-radius:6px;
+  padding:14px;
+  margin:16px 0;
+  overflow-x:auto;
+}
+.svgwrap svg{ display:block; margin:0 auto; }
+.svgwrap .cap{ text-align:center; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-soft); margin-top:6px;}
+
+.nextbtn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:26px;
+  background:var(--ink);
+  color:var(--parchment-3);
+  border:none;
+  padding:11px 20px;
+  font-family:var(--font-head);
+  font-size:14.5px;
+  letter-spacing:.06em;
+  border-radius:3px;
+  cursor:pointer;
+}
+.nextbtn:hover{ background:var(--arcane); }
+
+/* ---------- Exercises shared ---------- */
+.status-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin:16px 0 6px;
+  flex-wrap:wrap;
+}
+.pill{
+  font-family:var(--font-mono);
+  font-size:12px;
+  padding:5px 11px;
+  border-radius:20px;
+  border:1px solid var(--ink-soft);
+  color:var(--ink-soft);
+}
+.pill.attempts{ border-color:var(--seal-red); color:var(--seal-red);}
+.actionbar{ display:flex; gap:12px; margin-top:20px; flex-wrap:wrap; align-items:center;}
+.btn{
+  font-family:var(--font-head);
+  font-size:14.5px;
+  letter-spacing:.04em;
+  padding:11px 22px;
+  border-radius:3px;
+  border:1px solid var(--ink);
+  background:var(--ink);
+  color:var(--parchment-3);
+  cursor:pointer;
+}
+.btn.secondary{ background:transparent; color:var(--ink); }
+.btn.hint{ border-color:var(--seal-red); color:var(--seal-red); background:transparent; }
+.btn.solution{ border-color:var(--seal-red); background:var(--seal-red); color:#fff; }
+.btn:hover{ filter:brightness(1.12); }
+.feedback{ margin-top:14px; font-family:var(--font-head); font-size:15px; }
+.feedback.ok{ color:var(--seal-green); }
+.feedback.bad{ color:var(--seal-red); }
+.hint-text{
+  font-size:14px; color:var(--seal-red); font-style:italic; margin-top:4px;
+}
+.seal-badge{
+  display:inline-block; margin-top:16px; padding:10px 16px;
+  border:2px solid var(--seal-green); color:var(--seal-green);
+  border-radius:50%; font-family:var(--font-head); font-size:13px;
+  transform:rotate(-4deg);
+}
+
+/* Quiz */
+.q-block{ border-top:1px dashed var(--parchment-2); padding:18px 0; }
+.q-block:first-of-type{ border-top:none; }
+.q-title{ font-family:var(--font-head); font-size:16.5px; margin-bottom:10px;}
+.q-options{ display:grid; gap:8px; }
+.q-option{
+  display:flex; align-items:center; gap:10px;
+  padding:9px 12px; border:1px solid var(--parchment-2); border-radius:4px;
+  cursor:pointer; font-size:15.5px; background:rgba(255,255,255,.3);
+}
+.q-option:hover{ border-color:var(--gold); }
+.q-option.selected{ border-color:var(--arcane); background:rgba(47,111,106,.12); }
+.q-option.correct{ border-color:var(--seal-green); background:rgba(60,106,63,.15);}
+.q-option.incorrect{ border-color:var(--seal-red); background:rgba(124,46,40,.15);}
+.q-option input{ accent-color:var(--arcane); }
+
+/* Lückentext */
+.fill-text{ font-size:17.5px; line-height:2.3; }
+.fill-text input{
+  font-family:var(--font-mono);
+  font-size:.92em;
+  border:none;
+  border-bottom:2px solid var(--ink-soft);
+  background:transparent;
+  padding:2px 4px;
+  width:150px;
+  text-align:center;
+  color:var(--ink);
+}
+.fill-text input.ok{ border-bottom-color:var(--seal-green); color:var(--seal-green); font-weight:600;}
+.fill-text input.bad{ border-bottom-color:var(--seal-red); color:var(--seal-red); }
+
+/* Crossword */
+.cross-wrap{ display:flex; gap:32px; flex-wrap:wrap; align-items:flex-start; margin-top:10px;}
+#crossgrid{ border-collapse:collapse; }
+#crossgrid td{
+  width:30px; height:30px; text-align:center; padding:0; position:relative;
+}
+.cw-cell{ position:relative; width:30px; height:30px; }
+.cw-cell input{
+  width:100%; height:100%; border:1px solid var(--ink-soft);
+  text-align:center; font-family:var(--font-mono); font-size:15px;
+  background:var(--parchment-3); color:var(--ink); text-transform:uppercase;
+  padding:0;
+}
+.cw-cell input.ok{ background:#dcecdc; border-color:var(--seal-green); color:var(--seal-green); }
+.cw-cell input.bad{ background:#f3dcda; border-color:var(--seal-red); }
+.cw-empty{ background:transparent; }
+.cw-num{
+  position:absolute; top:-1px; left:1px; font-size:8px; font-family:var(--font-mono);
+  color:var(--ink-soft); pointer-events:none;
+}
+.clues{ min-width:230px; font-size:14.5px;}
+.clues h4{ font-family:var(--font-head); color:var(--arcane); margin:0 0 8px;}
+.clues ol{ padding-left:18px; margin:0 0 16px; }
+.clues li{ margin-bottom:6px; }
+
+footer.merk{
+  margin-top:30px;
+  padding-top:14px;
+  border-top:2px solid var(--gold);
+  font-family:var(--font-head);
+  font-style:italic;
+  color:var(--ink-soft);
+  font-size:14.5px;
+}
+
+@media (max-width: 860px){
+  .book{ grid-template-columns:1fr; }
+  .register{ border-right:none; border-bottom:2px solid var(--leather-3); border-radius:6px 6px 0 0; display:flex; overflow-x:auto; padding:12px 8px;}
+  .register-title{ display:none; }
+  .toc-group{ display:flex; padding:0; }
+  .toc-group-label{ display:none; }
+  .toc-btn{ white-space:nowrap; border-left:none; border-bottom:3px solid transparent; }
+  .toc-btn.active{ border-bottom-color:var(--gold); border-left:none; }
+  .page{ border-radius:0 0 6px 6px; max-height:none; padding:28px 22px 40px;}
+  .cross-wrap{ flex-direction:column; }
+}
+</style>
+</head>
+<body>
+<div class="grimoire-wrap">
+
+  <div class="masthead">
+    <div class="eyebrow">Fachinformatiker Anwendungsentwicklung · IHK-Arkanum</div>
+    <h1>Grimoire der UML</h1>
+    <p>Ein lebendes Buch der Notation — schlage jedes Kapitel jederzeit wieder auf und bestehe am Ende die drei Prüfungen des Wissens.</p>
+  </div>
+
+  <div class="book">
+    <nav class="register" id="register">
+      <div class="register-title">Inhaltsverzeichnis</div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Grundlagen</div>
+        <button class="toc-btn" data-ch="ch0"><span class="num">00</span>Vorwort des Magiers</button>
+        <button class="toc-btn" data-ch="ch1"><span class="num">01</span>Was ist UML?</button>
+        <button class="toc-btn" data-ch="ch2"><span class="num">02</span>Die Diagrammfamilien</button>
+      </div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Struktur</div>
+        <button class="toc-btn" data-ch="ch3"><span class="num">03</span>Klassendiagramm</button>
+        <button class="toc-btn" data-ch="ch4"><span class="num">04</span>Beziehungen &amp; Rauten</button>
+        <button class="toc-btn" data-ch="ch5"><span class="num">05</span>Objektdiagramm</button>
+      </div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Verhalten</div>
+        <button class="toc-btn" data-ch="ch6"><span class="num">06</span>Use-Case-Diagramm</button>
+        <button class="toc-btn" data-ch="ch7"><span class="num">07</span>Sequenzdiagramm</button>
+        <button class="toc-btn" data-ch="ch8"><span class="num">08</span>Aktivitätsdiagramm</button>
+        <button class="toc-btn" data-ch="ch9"><span class="num">09</span>Zustandsdiagramm</button>
+      </div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Prüfungsarkanum</div>
+        <button class="toc-btn" data-ch="ch10"><span class="num">10</span>Wann nutze ich was?</button>
+      </div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Nach der Lektüre: Die drei Prüfungen</div>
+        <button class="toc-btn" data-ch="quiz"><span class="num">Q</span>Quiz des Wissens<span class="seal" id="sealQuiz"></span></button>
+        <button class="toc-btn" data-ch="fill"><span class="num">L</span>Der Lückentext-Bann<span class="seal" id="sealFill"></span></button>
+        <button class="toc-btn" data-ch="cross"><span class="num">K</span>Kreuzworträtsel-Siegel<span class="seal" id="sealCross"></span></button>
+      </div>
+    </nav>
+
+    <div class="page" id="pageArea">
+
+      <!-- ===================== KAPITEL 0 ===================== -->
+      <section class="chapter active" id="ch0">
+        <div class="chapter-eyebrow">Vorwort</div>
+        <h2>Das Vorwort des Magiers</h2>
+        <p class="sub">Wozu ein Grimoire für eine Modellierungssprache?</p>
+        <p class="dropcap">Wer Software baut, ohne vorher zu skizzieren, baut Kartenhäuser. Dieses Grimoire versammelt das gesamte Wissen über die <strong>Unified Modeling Language (UML)</strong> — vom Aufbau einer einzelnen Klassen-Box bis zur Frage, welches Diagramm du in welcher Situation im Berufsalltag ziehst.</p>
+        <p>Du kannst jedes Kapitel jederzeit wieder aufschlagen — nichts wird verschlossen. Am Ende warten drei Prüfungen: ein <strong>Quiz</strong>, ein <strong>Lückentext</strong> und ein <strong>Kreuzworträtsel</strong>. Erst wer alle Fragen eines Bannes vollständig richtig beantwortet, hat ihn bestanden. Bei den beiden Bann-Prüfungen (Lückentext &amp; Kreuzworträtsel) erscheinen nach drei Fehlversuchen Hinweise, und ab dem vierten Fehlversuch kannst du dir — falls du magst — die Lösung offenbaren lassen.</p>
+        <div class="box why">
+          <span class="label">Warum das Ganze im Job zählt</span>
+          UML ist kein Selbstzweck. Wer Klassen-, Sequenz- oder Aktivitätsdiagramme lesen und zeichnen kann, spart im Team enorm viel Zeit: Missverständnisse fliegen in der Skizze auf, nicht erst im fertigen Code. Genau deshalb ist UML auch fester Bestandteil der IHK-Abschlussprüfung für Fachinformatiker Anwendungsentwicklung.
+        </div>
+        <button class="nextbtn" data-goto="ch1">Kapitel I aufschlagen →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 1 ===================== -->
+      <section class="chapter" id="ch1">
+        <div class="chapter-eyebrow">Kapitel I</div>
+        <h2>Was ist UML?</h2>
+        <p class="sub">Die genormte Sprache der Softwaremodellierung</p>
+        <p class="dropcap"><strong>UML</strong> steht für <strong>Unified Modeling Language</strong> — eine standardisierte, grafische Sprache zur Modellierung von Software-Systemen. Sie wird von der <strong>Object Management Group (OMG)</strong> gepflegt und ist unabhängig von jeder konkreten Programmiersprache.</p>
+        <p>UML besteht aus genormten Symbolen, Linien und Notationen. Egal ob Entwickler:in in Deutschland oder Kolleg:in in Indien — ein Klassendiagramm wird überall gleich gelesen.</p>
+
+        <h3>Die zwei großen Familien</h3>
+        <ul>
+          <li><strong>Strukturdiagramme</strong> — zeigen den statischen Aufbau: Was gibt es? Wie hängt es zusammen?</li>
+          <li><strong>Verhaltensdiagramme</strong> — zeigen dynamische Abläufe: Was passiert wann, in welcher Reihenfolge?</li>
+        </ul>
+
+        <div class="box why">
+          <span class="label">Warum im Job wichtig</span>
+          <ul style="margin:0;">
+            <li><strong>Kommunikation:</strong> Fachabteilung, Kundschaft und Entwicklung sprechen über dasselbe Bild statt über Code.</li>
+            <li><strong>Dokumentation:</strong> Neue Kolleg:innen verstehen ein System schneller anhand von Diagrammen als anhand von 10.000 Zeilen Code.</li>
+            <li><strong>Fehler früh erkennen:</strong> Ein Denkfehler auf dem Papier kostet Minuten — derselbe Fehler im fertigen Code kostet Tage.</li>
+            <li><strong>Prüfungsrelevanz:</strong> UML ist fester Bestandteil der schriftlichen und praktischen IHK-Prüfung (AP1/AP2) bei FIAE.</li>
+          </ul>
+        </div>
+
+        <div class="box ihk">
+          <span class="label">IHK-Merke</span>
+          UML ist eine <em>Sprache</em>, kein Werkzeug und keine Methode. Sie sagt dir nicht, <em>wie</em> du entwickelst (das macht z. B. Scrum), sondern <em>wie du das Ergebnis darstellst</em>.
+        </div>
+
+        <h3>Kurzer Blick in die Geschichte</h3>
+        <p>UML entstand Mitte der 1990er-Jahre, als Grady Booch, Ivar Jacobson und James Rumbaugh ("die drei Amigos") ihre bis dahin konkurrierenden Notationen zu einer gemeinsamen Sprache vereinten — daher der Name <em>„Unified“</em>. 1997 wurde UML von der OMG offiziell standardisiert. Aktuell ist die Version <strong>UML 2.5</strong> gültig, die in der IHK-Prüfung zugrunde gelegt wird.</p>
+
+        <h3>Wie viele Diagrammtypen hat UML wirklich?</h3>
+        <p>UML 2.5 kennt insgesamt <strong>14 Diagrammtypen</strong>. Für die FIAE-Ausbildung und die IHK-Prüfung sind davon nur etwa sieben wirklich relevant — genau die, die dieses Grimoire behandelt. Die übrigen (Komponenten-, Verteilungs-, Paket-, Kompositionsstruktur-, Kommunikations-, Timing- und Interaktionsübersichtsdiagramm) begegnen dir eher in größeren Softwarearchitektur-Projekten.</p>
+
+        <div class="box">
+          <span class="label">Werkzeuge aus der Praxis</span>
+          Im Berufsalltag zeichnet man UML selten von Hand: gängige Werkzeuge sind <strong>draw.io / diagrams.net</strong> (kostenlos, browserbasiert), <strong>PlantUML</strong> (Diagramme aus Textcode generieren — praktisch für Versionierung in Git), sowie professionelle Suiten wie <strong>Enterprise Architect</strong> oder <strong>Visual Paradigm</strong>. In der schriftlichen IHK-Prüfung wird dagegen von Hand auf Papier gezeichnet — Symbole sauber und eindeutig zu beherrschen ist also Pflicht.
+        </div>
+
+        <button class="nextbtn" data-goto="ch2">Weiter zu Kapitel II →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 2 ===================== -->
+      <section class="chapter" id="ch2">
+        <div class="chapter-eyebrow">Kapitel II</div>
+        <h2>Die Diagrammfamilien</h2>
+        <p class="sub">Ein Überblick über das gesamte Arkanum</p>
+        <p>UML kennt insgesamt 14 Diagrammtypen. Für die IHK-Prüfung reicht eine kleine, aber wichtige Auswahl — dieses Grimoire konzentriert sich genau darauf.</p>
+
+        <table class="grim">
+          <tr><th>Strukturdiagramme (statisch)</th><th>Verhaltensdiagramme (dynamisch)</th></tr>
+          <tr>
+            <td>
+              <strong>Klassendiagramm</strong> ★ IHK<br>
+              <strong>Objektdiagramm</strong> ★ IHK<br>
+              Komponentendiagramm<br>
+              Verteilungsdiagramm<br>
+              Paketdiagramm<br>
+              Kompositionsstrukturdiagramm
+            </td>
+            <td>
+              <strong>Use-Case-Diagramm</strong> ★ IHK<br>
+              <strong>Aktivitätsdiagramm</strong> ★ IHK<br>
+              <strong>Sequenzdiagramm</strong> ★ IHK<br>
+              <strong>Zustandsdiagramm</strong> ★ IHK<br>
+              Kommunikationsdiagramm<br>
+              Timing-Diagramm · Interaktionsübersicht
+            </td>
+          </tr>
+        </table>
+
+        <div class="box">
+          <span class="label">Merksatz</span>
+          Struktur beantwortet <strong>„Was existiert?“</strong>, Verhalten beantwortet <strong>„Was passiert?“</strong>.
+        </div>
+
+        <h3>Die übrigen Diagrammtypen kurz erklärt</h3>
+        <table class="grim">
+          <tr><th>Diagramm</th><th>Zeigt</th></tr>
+          <tr><td>Komponentendiagramm</td><td>Wie sich ein System aus austauschbaren technischen Bausteinen (Komponenten) zusammensetzt</td></tr>
+          <tr><td>Verteilungsdiagramm</td><td>Auf welcher Hardware (Server, Geräte) welche Software-Komponenten laufen</td></tr>
+          <tr><td>Paketdiagramm</td><td>Wie Klassen zu Paketen/Namensräumen gruppiert und voneinander abhängig sind</td></tr>
+          <tr><td>Kommunikationsdiagramm</td><td>Wie Sequenzdiagramm, aber der Fokus liegt auf den Objektbeziehungen statt auf der Zeit</td></tr>
+        </table>
+
+        <div class="box ihk">
+          <span class="label">Faustregel für die Prüfung</span>
+          Wird nach dem <em>Aufbau eines Systems zu einem festen Zeitpunkt</em> gefragt → Strukturdiagramm. Wird nach einem <em>Ablauf, Prozess oder einer Reaktion</em> gefragt → Verhaltensdiagramm. Diese Unterscheidung hilft dir, in der Prüfung sofort die richtige Diagrammfamilie einzugrenzen, bevor du überhaupt zu zeichnen beginnst.
+        </div>
+
+        <button class="nextbtn" data-goto="ch3">Weiter zu Kapitel III →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 3 ===================== -->
+      <section class="chapter" id="ch3">
+        <div class="chapter-eyebrow">Kapitel III</div>
+        <h2>Das Klassendiagramm</h2>
+        <p class="sub">Der Grundbaustein jeder objektorientierten Modellierung</p>
+        <p class="dropcap">Eine Klasse wird als Rechteck mit <strong>drei Fächern</strong> gezeichnet: Name, Attribute, Methoden.</p>
+
+        <div class="svgwrap">
+          <svg viewBox="0 0 320 190" width="320" height="190">
+            <rect x="10" y="10" width="220" height="170" fill="#fdf8e8" stroke="#2b1c10" stroke-width="2"/>
+            <line x1="10" y1="55" x2="230" y2="55" stroke="#2b1c10" stroke-width="1.5"/>
+            <line x1="10" y1="130" x2="230" y2="130" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="120" y="37" text-anchor="middle" font-family="Cinzel,serif" font-weight="700" font-size="16" fill="#2b1c10">Kunde</text>
+            <text x="20" y="75" font-family="JetBrains Mono,monospace" font-size="12" fill="#2b1c10">- kundenNr : int</text>
+            <text x="20" y="93" font-family="JetBrains Mono,monospace" font-size="12" fill="#2b1c10">- name : String</text>
+            <text x="20" y="111" font-family="JetBrains Mono,monospace" font-size="12" fill="#2b1c10">+ email : String</text>
+            <text x="20" y="150" font-family="JetBrains Mono,monospace" font-size="12" fill="#2b1c10">+ bestellen() : void</text>
+            <text x="20" y="168" font-family="JetBrains Mono,monospace" font-size="12" fill="#2b1c10">- pruefeBonitaet() : bool</text>
+            <text x="255" y="60" font-family="EB Garamond" font-style="italic" font-size="13" fill="#5a4327">Name</text>
+            <text x="255" y="95" font-family="EB Garamond" font-style="italic" font-size="13" fill="#5a4327">Attribute</text>
+            <text x="255" y="150" font-family="EB Garamond" font-style="italic" font-size="13" fill="#5a4327">Methoden</text>
+          </svg>
+          <div class="cap">Aufbau einer Klassen-Box: Name · Attribute · Methoden</div>
+        </div>
+
+        <h3>Sichtbarkeiten</h3>
+        <table class="grim">
+          <tr><th>Symbol</th><th>Bedeutung</th><th>Sichtbar für</th></tr>
+          <tr><td class="mono">+</td><td>public</td><td>alle Klassen</td></tr>
+          <tr><td class="mono">-</td><td>private</td><td>nur die eigene Klasse</td></tr>
+          <tr><td class="mono">#</td><td>protected</td><td>eigene Klasse + Unterklassen</td></tr>
+          <tr><td class="mono">~</td><td>package</td><td>Klassen im selben Paket</td></tr>
+        </table>
+
+        <h3>Notation</h3>
+        <p><strong>Attribut:</strong> <code>sichtbarkeit name : Datentyp [= Standardwert]</code><br>
+        <strong>Methode:</strong> <code>sichtbarkeit name(parameter: Typ) : Rückgabetyp</code></p>
+
+        <div class="box ihk">
+          <span class="label">IHK-Merke</span>
+          Abstrakte Klassen und abstrakte Methoden werden <em>kursiv</em> geschrieben. Eine Schnittstelle trägt den Stereotyp <span class="mono">«interface»</span> über dem Namen.
+        </div>
+
+        <h3>Weitere Notationsdetails</h3>
+        <table class="grim">
+          <tr><th>Element</th><th>Notation</th><th>Bedeutung</th></tr>
+          <tr><td>Statisches Attribut/Methode</td><td><u>unterstrichen</u></td><td>gehört zur Klasse selbst, nicht zu einzelnen Objekten (z. B. ein Zähler aller Instanzen)</td></tr>
+          <tr><td>Abstrakte Klasse/Methode</td><td><em>kursiv</em></td><td>kann nicht instanziiert werden bzw. hat keinen eigenen Rumpf</td></tr>
+          <tr><td>Konstante</td><td><span class="mono">{readOnly}</span> oder Großschreibung</td><td>Wert kann nach der Initialisierung nicht mehr geändert werden</td></tr>
+          <tr><td>Abgeleitetes Attribut</td><td><span class="mono">/alter</span></td><td>wird aus anderen Attributen berechnet, z. B. Alter aus Geburtsdatum</td></tr>
+        </table>
+
+        <h3>Namenskonventionen</h3>
+        <p>Klassennamen werden in <strong>PascalCase</strong> geschrieben (<span class="mono">Kundenkonto</span>), Attribute und Methoden in <strong>camelCase</strong> (<span class="mono">kontostand</span>, <span class="mono">geldAbheben()</span>). Diese Konvention orientiert sich an gängigen Programmiersprachen wie Java und C# und wird in der IHK-Prüfung als „sauberer Stil“ erwartet.</p>
+
+        <h3>Abstrakte Klasse vs. Schnittstelle</h3>
+        <table class="grim">
+          <tr><th></th><th>Abstrakte Klasse</th><th>Schnittstelle («interface»)</th></tr>
+          <tr><td>Attribute</td><td>erlaubt</td><td>i. d. R. nicht (nur Konstanten)</td></tr>
+          <tr><td>Methodenrumpf</td><td>teilweise erlaubt</td><td>nie — nur Signaturen</td></tr>
+          <tr><td>Vererbung</td><td>einfach (eine Oberklasse)</td><td>eine Klasse kann mehrere Interfaces umsetzen</td></tr>
+          <tr><td>Beziehungstyp</td><td>Vererbung/Generalisierung</td><td>Realisierung (gestrichelter Pfeil)</td></tr>
+        </table>
+
+        <div class="box why">
+          <span class="label">Vorteil im Job</span>
+          Ein sauberes Klassendiagramm entsteht meist, <em>bevor</em> die erste Zeile Code geschrieben wird. Es zwingt dich, Verantwortlichkeiten klar zu trennen (ein Prinzip aus dem <em>Single-Responsibility-Prinzip</em>) und deckt Modellierungsfehler auf, solange sie noch nichts kosten.
+        </div>
+
+        <button class="nextbtn" data-goto="ch4">Weiter zu Kapitel IV →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 4 ===================== -->
+      <section class="chapter" id="ch4">
+        <div class="chapter-eyebrow">Kapitel IV</div>
+        <h2>Beziehungen &amp; Rauten</h2>
+        <p class="sub">Wie Klassen miteinander im Bunde stehen</p>
+
+        <div class="svgwrap">
+          <svg viewBox="0 0 620 260" width="620" height="260">
+            <!-- Assoziation -->
+            <line x1="20" y1="30" x2="180" y2="30" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="190" y="35" font-family="EB Garamond" font-size="14" fill="#2b1c10">Assoziation — „kennt“</text>
+
+            <!-- Aggregation -->
+            <line x1="20" y1="70" x2="170" y2="70" stroke="#2b1c10" stroke-width="1.5"/>
+            <polygon points="20,70 34,63 48,70 34,77" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="190" y="75" font-family="EB Garamond" font-size="14" fill="#2b1c10">Aggregation — schwaches „hat-ein“</text>
+
+            <!-- Komposition -->
+            <line x1="20" y1="110" x2="170" y2="110" stroke="#2b1c10" stroke-width="1.5"/>
+            <polygon points="20,110 34,103 48,110 34,117" fill="#2b1c10" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="190" y="115" font-family="EB Garamond" font-size="14" fill="#2b1c10">Komposition — starkes „besteht-aus“</text>
+
+            <!-- Vererbung -->
+            <line x1="20" y1="150" x2="160" y2="150" stroke="#2b1c10" stroke-width="1.5"/>
+            <polygon points="160,150 145,143 145,157" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="190" y="155" font-family="EB Garamond" font-size="14" fill="#2b1c10">Vererbung — „ist-ein“</text>
+
+            <!-- Realisierung -->
+            <line x1="20" y1="190" x2="160" y2="190" stroke="#2b1c10" stroke-width="1.5" stroke-dasharray="6,4"/>
+            <polygon points="160,190 145,183 145,197" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="190" y="195" font-family="EB Garamond" font-size="14" fill="#2b1c10">Realisierung — implementiert Interface</text>
+
+            <!-- Abhängigkeit -->
+            <line x1="20" y1="230" x2="160" y2="230" stroke="#2b1c10" stroke-width="1.5" stroke-dasharray="6,4"/>
+            <polyline points="148,224 160,230 148,236" fill="none" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="190" y="235" font-family="EB Garamond" font-size="14" fill="#2b1c10">Abhängigkeit — „benutzt“</text>
+          </svg>
+          <div class="cap">Die sechs wichtigsten Beziehungsarten im Klassendiagramm</div>
+        </div>
+
+        <table class="grim">
+          <tr><th>Beziehung</th><th>Symbol</th><th>Merksatz</th><th>Beispiel</th></tr>
+          <tr><td>Assoziation</td><td>einfache Linie, ggf. mit Multiplizität</td><td>„kennt“</td><td>Kunde – Bestellung</td></tr>
+          <tr><td>Aggregation</td><td>leere Raute am Ganzen</td><td>Teile leben auch ohne das Ganze weiter</td><td>Universität – Student</td></tr>
+          <tr><td>Komposition</td><td>gefüllte Raute am Ganzen</td><td>Teile sterben mit dem Ganzen</td><td>Haus – Zimmer</td></tr>
+          <tr><td>Vererbung / Generalisierung</td><td>leeres, geschlossenes Dreieck</td><td>Pfeil zeigt zur Oberklasse</td><td>Hund → Tier</td></tr>
+          <tr><td>Realisierung</td><td>gestrichelt + leeres Dreieck</td><td>Klasse setzt Interface um</td><td>Auto → «interface» Fahrbar</td></tr>
+          <tr><td>Abhängigkeit</td><td>gestrichelt + offener Pfeil</td><td>nutzt kurzfristig, z. B. als Parameter</td><td>Drucker → Dokument</td></tr>
+        </table>
+
+        <h3>Multiplizitäten</h3>
+        <p>An den Enden einer Assoziation steht, wie viele Objekte beteiligt sein können: <code>1</code>, <code>0..1</code>, <code>1..*</code>, <code>0..*</code> (oder <code>*</code>), <code>3..7</code>.</p>
+
+        <div class="box ihk">
+          <span class="label">IHK-Merke</span>
+          Die Raute sitzt <strong>immer am „Ganzen“</strong>, niemals am Teil. Die Pfeilspitze der Vererbung zeigt <strong>immer zur Oberklasse</strong> — ein beliebter Fehler in der Prüfung ist die vertauschte Pfeilrichtung.
+        </div>
+
+        <h3>Rollennamen und Navigierbarkeit</h3>
+        <p>An den Enden einer Assoziation können zusätzlich <strong>Rollennamen</strong> stehen, die beschreiben, welche Rolle eine Klasse in der Beziehung einnimmt — z. B. trägt bei <span class="mono">Person – Firma</span> das Firmen-Ende die Rolle <span class="mono">arbeitgeber</span> und das Personen-Ende die Rolle <span class="mono">mitarbeiter</span>. Ein <strong>offener Pfeil</strong> an einem Ende zeigt die <strong>Navigierbarkeit</strong> an: Von hier aus „kennt“ man die andere Seite direkt (z. B. lässt sich vom Kunden aus auf seine Bestellungen zugreifen, aber nicht zwingend umgekehrt).</p>
+
+        <h3>Vom Text zum Diagramm — ein Beispiel</h3>
+        <p>Fachtext: <em>„Ein Kunde kann beliebig viele Bestellungen aufgeben. Jede Bestellung gehört genau zu einem Kunden und besteht aus mindestens einer Bestellposition. Eine Bestellposition kann ohne die Bestellung nicht existieren.“</em></p>
+        <table class="grim">
+          <tr><th>Textstelle</th><th>Modellierung</th></tr>
+          <tr><td>„kann beliebig viele … aufgeben“</td><td>Multiplizität <span class="mono">0..*</span> an der Bestellungs-Seite</td></tr>
+          <tr><td>„gehört genau zu einem Kunden“</td><td>Multiplizität <span class="mono">1</span> an der Kunden-Seite</td></tr>
+          <tr><td>„besteht aus … Bestellposition“</td><td>Ganzes-Teil-Beziehung: Bestellung = Ganzes, Bestellposition = Teil</td></tr>
+          <tr><td>„kann ohne die Bestellung nicht existieren“</td><td><strong>Komposition</strong> (gefüllte Raute an der Bestellung)</td></tr>
+        </table>
+
+        <div class="box">
+          <span class="label">Multiplizitäts-Spickzettel</span>
+          <span class="mono">1</span> genau eins · <span class="mono">0..1</span> keins oder eins · <span class="mono">1..*</span> mindestens eins · <span class="mono">0..*</span> bzw. <span class="mono">*</span> beliebig viele (auch null) · <span class="mono">3..7</span> ein fester Bereich.
+        </div>
+
+        <button class="nextbtn" data-goto="ch5">Weiter zu Kapitel V →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 5 ===================== -->
+      <section class="chapter" id="ch5">
+        <div class="chapter-eyebrow">Kapitel V</div>
+        <h2>Objektdiagramm</h2>
+        <p class="sub">Die Momentaufnahme</p>
+        <p class="dropcap">Ein Objektdiagramm zeigt <strong>konkrete Objekte</strong> mit ihren <strong>tatsächlichen Werten</strong> zu einem bestimmten Zeitpunkt — quasi ein Foto des Klassendiagramms zur Laufzeit.</p>
+        <p>Notation: <code>objektname : Klasse</code>, der gesamte Text ist <u>unterstrichen</u>. Attribute erhalten konkrete Werte statt Datentypen, z. B. <code>name = "Nadine Berg"</code>.</p>
+        <div class="box why">
+          <span class="label">Wann einsetzen</span>
+          Objektdiagramme eignen sich hervorragend, um Testfälle zu veranschaulichen oder um ein komplexes Klassendiagramm mit einem konkreten Beispiel zu verifizieren — „stimmt mein Modell mit der Realität überein?“
+        </div>
+
+        <h3>Beispiel</h3>
+        <p>Zum Klassendiagramm <span class="mono">Kunde – Bestellung</span> könnte ein Objektdiagramm so aussehen:</p>
+        <table class="grim">
+          <tr><th>Objekt</th><th>Attributwerte</th></tr>
+          <tr><td><u>nadine : Kunde</u></td><td>name = "Nadine Berg", kundenNr = 1042</td></tr>
+          <tr><td><u>b1 : Bestellung</u></td><td>datum = "12.03.2026", status = "versendet"</td></tr>
+        </table>
+
+        <h3>Klassendiagramm vs. Objektdiagramm</h3>
+        <table class="grim">
+          <tr><th></th><th>Klassendiagramm</th><th>Objektdiagramm</th></tr>
+          <tr><td>Zeigt</td><td>allgemeinen Bauplan</td><td>konkrete Momentaufnahme</td></tr>
+          <tr><td>Attribute</td><td>Name : Datentyp</td><td>name = Wert</td></tr>
+          <tr><td>Gültigkeit</td><td>dauerhaft</td><td>nur zu einem Zeitpunkt</td></tr>
+        </table>
+
+        <button class="nextbtn" data-goto="ch6">Weiter zu Kapitel VI →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 6 ===================== -->
+      <section class="chapter" id="ch6">
+        <div class="chapter-eyebrow">Kapitel VI</div>
+        <h2>Use-Case-Diagramm</h2>
+        <p class="sub">Anforderungen aus Sicht der Nutzenden</p>
+
+        <div class="svgwrap">
+          <svg viewBox="0 0 420 210" width="420" height="210">
+            <rect x="150" y="10" width="250" height="190" fill="none" stroke="#2b1c10" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <text x="275" y="26" text-anchor="middle" font-family="Cinzel,serif" font-size="12" fill="#5a4327">System: Online-Shop</text>
+            <!-- Akteur -->
+            <circle cx="45" cy="60" r="10" fill="none" stroke="#2b1c10" stroke-width="2"/>
+            <line x1="45" y1="70" x2="45" y2="105" stroke="#2b1c10" stroke-width="2"/>
+            <line x1="25" y1="85" x2="65" y2="85" stroke="#2b1c10" stroke-width="2"/>
+            <line x1="45" y1="105" x2="28" y2="130" stroke="#2b1c10" stroke-width="2"/>
+            <line x1="45" y1="105" x2="62" y2="130" stroke="#2b1c10" stroke-width="2"/>
+            <text x="45" y="150" text-anchor="middle" font-family="EB Garamond" font-size="13" fill="#2b1c10">Kundin</text>
+            <!-- Use cases -->
+            <ellipse cx="270" cy="55" rx="80" ry="24" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="270" y="59" text-anchor="middle" font-family="EB Garamond" font-size="13" fill="#2b1c10">Bestellung aufgeben</text>
+            <ellipse cx="270" cy="115" rx="80" ry="24" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="270" y="119" text-anchor="middle" font-family="EB Garamond" font-size="13" fill="#2b1c10">Bezahlen</text>
+            <ellipse cx="270" cy="172" rx="80" ry="24" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="270" y="176" text-anchor="middle" font-family="EB Garamond" font-size="13" fill="#2b1c10">Gutschein einlösen</text>
+            <line x1="66" y1="90" x2="196" y2="60" stroke="#2b1c10" stroke-width="1.3"/>
+            <line x1="65" y1="100" x2="196" y2="115" stroke="#2b1c10" stroke-width="1.3"/>
+            <line x1="270" y1="79" x2="270" y2="91" stroke="#2b1c10" stroke-width="1.3" stroke-dasharray="4,3"/>
+            <text x="330" y="88" font-family="JetBrains Mono,monospace" font-size="10" fill="#5a4327">«include»</text>
+            <line x1="270" y1="148" x2="270" y2="139" stroke="#2b1c10" stroke-width="1.3" stroke-dasharray="4,3"/>
+            <text x="322" y="150" font-family="JetBrains Mono,monospace" font-size="10" fill="#5a4327">«extend»</text>
+          </svg>
+          <div class="cap">Akteur, Use Cases, Systemgrenze, «include»/«extend»</div>
+        </div>
+
+        <ul>
+          <li><strong>Akteur</strong> (Strichmännchen): Person, Rolle oder auch ein anderes System, das mit dem System interagiert — muss kein Mensch sein!</li>
+          <li><strong>Use Case</strong> (Ellipse): eine Funktionalität aus Sicht der Nutzenden.</li>
+          <li><strong>Systemgrenze</strong>: das gestrichelte Rechteck um alle Use Cases.</li>
+          <li><span class="mono">«include»</span>: der eingebundene Use Case wird <strong>immer</strong> mit ausgeführt (z. B. „Bezahlen“ braucht immer „Bestellung aufgeben“).</li>
+          <li><span class="mono">«extend»</span>: der erweiternde Use Case ist <strong>optional</strong> und läuft nur unter bestimmten Bedingungen mit.</li>
+        </ul>
+
+        <div class="box why">
+          <span class="label">Warum im Job wichtig</span>
+          Use-Case-Diagramme sind die perfekte Grundlage für Lasten- und Pflichtenheft: Sie erfassen Anforderungen so, wie Fachabteilung oder Kundschaft sie beschreiben würden — ganz ohne technisches Vokabular.
+        </div>
+
+        <h3>Primäre und sekundäre Akteure</h3>
+        <p>Ein <strong>primärer Akteur</strong> stößt den Use Case an und will ein Ziel erreichen (z. B. die Kundin, die bestellt). Ein <strong>sekundärer Akteur</strong> wird während des Ablaufs benötigt, ohne die Initiative zu ergreifen — z. B. ein externer <strong>Zahlungsdienstleister</strong> als System-Akteur. Akteure können sich auch generalisieren: „Zahlungspflichtiger“ als Oberbegriff für „Privatkunde“ und „Geschäftskunde“, dargestellt mit demselben leeren Dreieckspfeil wie bei Klassen.</p>
+
+        <h3>Use-Case-Beschreibung (Standardformat)</h3>
+        <p>In der Praxis — und gern auch in der IHK-Prüfung — wird zu einem Use Case eine kurze Tabelle ergänzt:</p>
+        <table class="grim">
+          <tr><th>Feld</th><th>Inhalt</th></tr>
+          <tr><td>Name</td><td>Bestellung aufgeben</td></tr>
+          <tr><td>Akteur</td><td>Kundin</td></tr>
+          <tr><td>Vorbedingung</td><td>Kundin ist eingeloggt, Warenkorb ist gefüllt</td></tr>
+          <tr><td>Ablauf</td><td>1. Kundin prüft Warenkorb 2. Kundin wählt Zahlungsart 3. System bestätigt Bestellung</td></tr>
+          <tr><td>Nachbedingung</td><td>Bestellung ist im System gespeichert</td></tr>
+        </table>
+
+        <div class="box ihk">
+          <span class="label">IHK-Merke</span>
+          Ein Akteur muss <strong>kein Mensch</strong> sein — auch ein Fremdsystem, ein Zeitgeber („Cron-Job“) oder eine Hardware-Komponente kann Akteur sein, solange es von außen mit dem System interagiert.
+        </div>
+
+        <button class="nextbtn" data-goto="ch7">Weiter zu Kapitel VII →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 7 ===================== -->
+      <section class="chapter" id="ch7">
+        <div class="chapter-eyebrow">Kapitel VII</div>
+        <h2>Sequenzdiagramm</h2>
+        <p class="sub">Der zeitliche Ablauf einer Interaktion</p>
+
+        <div class="svgwrap">
+          <svg viewBox="0 0 420 220" width="420" height="220">
+            <text x="60" y="20" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#2b1c10">:Kunde</text>
+            <text x="220" y="20" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#2b1c10">:Warenkorb</text>
+            <text x="360" y="20" text-anchor="middle" font-family="Cinzel,serif" font-size="13" fill="#2b1c10">:Zahlungsdienst</text>
+            <line x1="60" y1="30" x2="60" y2="200" stroke="#2b1c10" stroke-width="1.3" stroke-dasharray="4,3"/>
+            <line x1="220" y1="30" x2="220" y2="200" stroke="#2b1c10" stroke-width="1.3" stroke-dasharray="4,3"/>
+            <line x1="360" y1="30" x2="360" y2="200" stroke="#2b1c10" stroke-width="1.3" stroke-dasharray="4,3"/>
+            <rect x="55" y="60" width="10" height="30" fill="#fdf8e8" stroke="#2b1c10"/>
+            <rect x="215" y="70" width="10" height="80" fill="#fdf8e8" stroke="#2b1c10"/>
+            <rect x="355" y="110" width="10" height="30" fill="#fdf8e8" stroke="#2b1c10"/>
+            <line x1="65" y1="75" x2="215" y2="75" stroke="#2b1c10" stroke-width="1.3"/>
+            <polygon points="215,75 205,71 205,79" fill="#2b1c10"/>
+            <text x="140" y="70" text-anchor="middle" font-family="EB Garamond" font-size="12" fill="#2b1c10">bestellen()</text>
+            <line x1="225" y1="115" x2="355" y2="115" stroke="#2b1c10" stroke-width="1.3"/>
+            <polygon points="355,115 345,111 345,119" fill="#2b1c10"/>
+            <text x="290" y="110" text-anchor="middle" font-family="EB Garamond" font-size="12" fill="#2b1c10">zahlen()</text>
+            <line x1="355" y1="140" x2="225" y2="140" stroke="#2b1c10" stroke-width="1.3" stroke-dasharray="5,3"/>
+            <polygon points="225,140 235,136 235,144" fill="#2b1c10"/>
+            <text x="290" y="155" text-anchor="middle" font-family="EB Garamond" font-size="11" fill="#5a4327">Rückgabe: Beleg</text>
+          </svg>
+          <div class="cap">Lebenslinien, Aktivierungsbalken, synchrone Nachricht (durchgezogen) und Rückgabe (gestrichelt)</div>
+        </div>
+
+        <ul>
+          <li><strong>Lebenslinie</strong>: vertikale gestrichelte Linie — steht für ein Objekt über die Zeit.</li>
+          <li><strong>Aktivierungsbalken</strong>: schmales Rechteck — zeigt, wie lange ein Objekt aktiv Code ausführt.</li>
+          <li><strong>Nachricht</strong>: durchgezogener Pfeil = synchroner Aufruf, gestrichelter Pfeil = Rückgabe, offener Pfeilkopf = asynchroner Aufruf.</li>
+          <li><strong>Frames</strong>: <span class="mono">alt</span> (Alternative/if-else), <span class="mono">loop</span> (Wiederholung), <span class="mono">opt</span> (optionaler Block).</li>
+        </ul>
+
+        <div class="box why">
+          <span class="label">Wann einsetzen</span>
+          Immer dann, wenn die <strong>Reihenfolge</strong> von Aufrufen wichtig ist — etwa bei API-Kommunikation, komplexen Methodenaufrufen oder beim Debugging eines Ablaufs zwischen mehreren Objekten oder Systemen.
+        </div>
+
+        <h3>Alle Frames im Überblick</h3>
+        <table class="grim">
+          <tr><th>Frame</th><th>Bedeutung</th></tr>
+          <tr><td class="mono">alt</td><td>Alternative — wie if/else, getrennt durch eine gestrichelte Linie im Frame</td></tr>
+          <tr><td class="mono">opt</td><td>optionaler Block — wird nur bei erfüllter Bedingung durchlaufen</td></tr>
+          <tr><td class="mono">loop</td><td>Wiederholung, oft mit Bedingung wie <span class="mono">loop [solange Artikel vorhanden]</span></td></tr>
+          <tr><td class="mono">par</td><td>parallele Ausführung mehrerer Abläufe gleichzeitig</td></tr>
+          <tr><td class="mono">break</td><td>bricht den umgebenden Ablauf bei Erfüllung der Bedingung ab</td></tr>
+          <tr><td class="mono">ref</td><td>Verweis auf ein anderes, ausgelagertes Sequenzdiagramm</td></tr>
+        </table>
+
+        <h3>Objekte erzeugen und zerstören</h3>
+        <p>Ein neu erzeugtes Objekt beginnt seine Lebenslinie erst an der Stelle des Aufrufs, meist mit einer Nachricht <span class="mono">«create»</span> auf die Objekt-Box selbst. Das Ende eines Objekts wird mit einem großen <strong>X</strong> auf der Lebenslinie markiert (z. B. wenn ein temporäres Objekt seine Aufgabe erledigt hat).</p>
+        <p>Eine <strong>Selbstnachricht</strong> (ein Objekt ruft eine eigene Methode auf) wird als kleine Schleife auf derselben Lebenslinie dargestellt.</p>
+
+        <div class="box ihk">
+          <span class="label">IHK-Merke</span>
+          Achte in der Prüfung genau auf den Unterschied zwischen <strong>Aufruf</strong> (durchgezogene Linie, geschlossener oder offener Pfeilkopf) und <strong>Rückgabe</strong> (gestrichelte Linie). Eine fehlende Rückgabe-Nachricht ist ein häufiger Punktabzug.
+        </div>
+
+        <button class="nextbtn" data-goto="ch8">Weiter zu Kapitel VIII →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 8 ===================== -->
+      <section class="chapter" id="ch8">
+        <div class="chapter-eyebrow">Kapitel VIII</div>
+        <h2>Aktivitätsdiagramm</h2>
+        <p class="sub">Der Ablauf eines Prozesses</p>
+
+        <div class="svgwrap">
+          <svg viewBox="0 0 260 320" width="260" height="320">
+            <circle cx="130" cy="20" r="9" fill="#2b1c10"/>
+            <line x1="130" y1="29" x2="130" y2="55" stroke="#2b1c10" stroke-width="1.3"/>
+            <rect x="70" y="55" width="120" height="34" rx="16" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="130" y="76" text-anchor="middle" font-family="EB Garamond" font-size="12" fill="#2b1c10">Formular prüfen</text>
+            <line x1="130" y1="89" x2="130" y2="115" stroke="#2b1c10" stroke-width="1.3"/>
+            <polygon points="130,115 165,140 130,165 95,140" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="130" y="144" text-anchor="middle" font-family="EB Garamond" font-size="11" fill="#2b1c10">gültig?</text>
+            <line x1="165" y1="140" x2="220" y2="140" stroke="#2b1c10" stroke-width="1.3"/>
+            <text x="185" y="132" font-family="JetBrains Mono,monospace" font-size="9" fill="#5a4327">[nein]</text>
+            <line x1="220" y1="140" x2="220" y2="60" stroke="#2b1c10" stroke-width="1.3"/>
+            <line x1="220" y1="60" x2="190" y2="60" stroke="#2b1c10" stroke-width="1.3" marker-end="url(#arrow)"/>
+            <line x1="130" y1="165" x2="130" y2="190" stroke="#2b1c10" stroke-width="1.3"/>
+            <text x="140" y="182" font-family="JetBrains Mono,monospace" font-size="9" fill="#5a4327">[ja]</text>
+            <rect x="70" y="190" width="120" height="34" rx="16" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="130" y="211" text-anchor="middle" font-family="EB Garamond" font-size="12" fill="#2b1c10">Daten speichern</text>
+            <line x1="130" y1="224" x2="130" y2="250" stroke="#2b1c10" stroke-width="1.3"/>
+            <circle cx="130" cy="270" r="10" fill="none" stroke="#2b1c10" stroke-width="2"/>
+            <circle cx="130" cy="270" r="5" fill="#2b1c10"/>
+          </svg>
+          <div class="cap">Start, Aktion, Entscheidungsraute mit Bedingungen, Ende</div>
+        </div>
+
+        <ul>
+          <li><strong>Startknoten</strong> (gefüllter Kreis) und <strong>Endknoten</strong> (Kreis mit Ring).</li>
+          <li><strong>Aktion</strong>: abgerundetes Rechteck.</li>
+          <li><strong>Entscheidung</strong>: Raute mit Bedingungen in eckigen Klammern, z. B. <span class="mono">[gültig]</span>.</li>
+          <li><strong>Gabelung/Zusammenführung</strong> (Fork/Join): dicker schwarzer Balken — für parallele Abläufe.</li>
+          <li><strong>Schwimmbahnen</strong> (Swimlanes): teilen das Diagramm nach Verantwortlichkeit, z. B. Kundin | System | Buchhaltung.</li>
+        </ul>
+
+        <div class="box why">
+          <span class="label">Wann einsetzen</span>
+          Ideal für Geschäftsprozesse und Workflows — ähnlich einem klassischen Flussdiagramm, aber UML-genormt und damit auch für die IHK-Prüfung eindeutig lesbar.
+        </div>
+
+        <h3>Schwimmbahnen — ein Beispiel</h3>
+        <table class="grim">
+          <tr><th>Kundin</th><th>Online-Shop</th><th>Versanddienst</th></tr>
+          <tr><td>Bestellung aufgeben</td><td>Zahlung prüfen</td><td>—</td></tr>
+          <tr><td>—</td><td>Ware kommissionieren</td><td>Paket abholen</td></tr>
+          <tr><td>Paket empfangen</td><td>—</td><td>Paket zustellen</td></tr>
+        </table>
+        <p>Jede Spalte zeigt, <strong>wer</strong> für welchen Schritt verantwortlich ist — sehr nützlich, um Zuständigkeiten in einem Prozess sichtbar zu machen und Schnittstellen zwischen Abteilungen oder Systemen zu erkennen.</p>
+
+        <h3>Weitere Notationselemente</h3>
+        <ul>
+          <li><strong>Objektknoten/Pins</strong>: zeigen, welches Datenobjekt zwischen zwei Aktionen weitergereicht wird (z. B. „Bestellung“ als Rechteck zwischen zwei Aktionen).</li>
+          <li><strong>Senden-/Empfangen-Signal</strong>: konkave/konvexe Fünfecke für asynchrone Ereignisse, z. B. „Bestätigungs-E-Mail senden“.</li>
+          <li><strong>Notiz/Kommentar</strong>: gestricheltes Rechteck mit Eselsohr für zusätzliche Erklärungen im Diagramm.</li>
+        </ul>
+
+        <div class="box ihk">
+          <span class="label">IHK-Merke</span>
+          Verwechsle Fork/Join (paralleler Ablauf, <strong>beide</strong> Zweige laufen) nicht mit der Entscheidungsraute (nur <strong>ein</strong> Zweig wird abhängig von der Bedingung durchlaufen) — ein Klassiker unter den Prüfungsfallen.
+        </div>
+
+        <button class="nextbtn" data-goto="ch9">Weiter zu Kapitel IX →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 9 ===================== -->
+      <section class="chapter" id="ch9">
+        <div class="chapter-eyebrow">Kapitel IX</div>
+        <h2>Zustandsdiagramm</h2>
+        <p class="sub">Der Lebenszyklus eines Objekts</p>
+
+        <div class="svgwrap">
+          <svg viewBox="0 0 480 100" width="480" height="100">
+            <circle cx="20" cy="50" r="7" fill="#2b1c10"/>
+            <line x1="27" y1="50" x2="60" y2="50" stroke="#2b1c10" stroke-width="1.3" marker-end="url(#arrow)"/>
+            <rect x="60" y="30" width="80" height="40" rx="18" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="100" y="54" text-anchor="middle" font-family="EB Garamond" font-size="12" fill="#2b1c10">Neu</text>
+            <line x1="140" y1="50" x2="180" y2="50" stroke="#2b1c10" stroke-width="1.3" marker-end="url(#arrow)"/>
+            <text x="145" y="42" font-family="JetBrains Mono,monospace" font-size="9" fill="#5a4327">bezahlt</text>
+            <rect x="180" y="30" width="90" height="40" rx="18" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="225" y="54" text-anchor="middle" font-family="EB Garamond" font-size="12" fill="#2b1c10">Bezahlt</text>
+            <line x1="270" y1="50" x2="310" y2="50" stroke="#2b1c10" stroke-width="1.3" marker-end="url(#arrow)"/>
+            <text x="273" y="42" font-family="JetBrains Mono,monospace" font-size="9" fill="#5a4327">versendet</text>
+            <rect x="310" y="30" width="100" height="40" rx="18" fill="#fdf8e8" stroke="#2b1c10" stroke-width="1.5"/>
+            <text x="360" y="54" text-anchor="middle" font-family="EB Garamond" font-size="12" fill="#2b1c10">Versendet</text>
+            <line x1="410" y1="50" x2="450" y2="50" stroke="#2b1c10" stroke-width="1.3" marker-end="url(#arrow)"/>
+            <circle cx="460" cy="50" r="7" fill="none" stroke="#2b1c10" stroke-width="2"/>
+            <circle cx="460" cy="50" r="3" fill="#2b1c10"/>
+          </svg>
+          <div class="cap">Zustände einer Bestellung mit Transitionen und Triggern</div>
+        </div>
+
+        <p>Ein Zustandsdiagramm zeigt <strong>alle möglichen Zustände</strong> eines einzelnen Objekts sowie die <strong>Transitionen</strong> (Übergänge) dazwischen, ausgelöst durch Trigger — häufig in der Form <span class="mono">Trigger [Bedingung] / Aktion</span>.</p>
+
+        <div class="box why">
+          <span class="label">Wann einsetzen</span>
+          Perfekt, wenn ein einzelnes Objekt einen klaren Lebenszyklus mit mehreren Stadien durchläuft — z. B. eine Bestellung (neu → bezahlt → versendet → abgeschlossen) oder ein Support-Ticket (offen → in Bearbeitung → gelöst → geschlossen).
+        </div>
+
+        <h3>entry-, exit- und do-Aktivitäten</h3>
+        <p>Innerhalb eines Zustands können drei besondere Aktivitäten stehen: <span class="mono">entry/</span> (wird beim Betreten des Zustands einmalig ausgeführt), <span class="mono">exit/</span> (beim Verlassen) und <span class="mono">do/</span> (läuft, solange sich das Objekt im Zustand befindet — z. B. <span class="mono">do/ Ladebalken anzeigen</span>).</p>
+
+        <h3>Zusammengesetzte Zustände &amp; History</h3>
+        <p>Ein Zustand kann selbst wieder Unterzustände enthalten (<strong>zusammengesetzter Zustand</strong>), z. B. enthält „In Bearbeitung“ die Unterzustände „Wird geprüft“ und „Wird bearbeitet“. Ein <strong>History-Zustand</strong> (Kreis mit „H“) merkt sich, in welchem Unterzustand das Objekt zuletzt war, falls der übergeordnete Zustand erneut betreten wird.</p>
+
+        <div class="box ihk">
+          <span class="label">IHK-Merke</span>
+          Verwechsle das Zustandsdiagramm nicht mit dem Aktivitätsdiagramm: Das Zustandsdiagramm betrachtet <strong>ein einzelnes Objekt</strong> über seinen Lebenszyklus, das Aktivitätsdiagramm einen <strong>Ablauf</strong>, oft über mehrere Objekte/Akteure hinweg.
+        </div>
+
+        <button class="nextbtn" data-goto="ch10">Weiter zu Kapitel X →</button>
+      </section>
+
+      <!-- ===================== KAPITEL 10 ===================== -->
+      <section class="chapter" id="ch10">
+        <div class="chapter-eyebrow">Kapitel X</div>
+        <h2>Wann nutze ich welches Diagramm?</h2>
+        <p class="sub">Das Übersichts-Arkanum für die Prüfung</p>
+
+        <table class="grim">
+          <tr><th>Ziel</th><th>Diagramm</th></tr>
+          <tr><td>Statischen Aufbau von Klassen &amp; Beziehungen zeigen</td><td>Klassendiagramm</td></tr>
+          <tr><td>Konkreten Zustand zu einem Zeitpunkt belegen (Testfall)</td><td>Objektdiagramm</td></tr>
+          <tr><td>Anforderungen aus Nutzersicht sammeln</td><td>Use-Case-Diagramm</td></tr>
+          <tr><td>Zeitlichen Ablauf / Kommunikation zwischen Objekten zeigen</td><td>Sequenzdiagramm</td></tr>
+          <tr><td>Geschäftsprozess oder Workflow modellieren</td><td>Aktivitätsdiagramm</td></tr>
+          <tr><td>Lebenszyklus eines einzelnen Objekts abbilden</td><td>Zustandsdiagramm</td></tr>
+        </table>
+
+        <div class="box ihk">
+          <span class="label">Die häufigsten Prüfungsfehler</span>
+          <ul style="margin:0;">
+            <li>Gefüllte und leere Raute vertauschen (Komposition ↔ Aggregation).</li>
+            <li>Pfeilrichtung der Vererbung falsch herum zeichnen.</li>
+            <li>Multiplizität falsch lesen — Reihenfolge ist immer <em>am gegenüberliegenden Ende</em> der jeweiligen Klasse.</li>
+            <li>Annehmen, ein Akteur müsse ein Mensch sein — auch Fremdsysteme sind Akteure.</li>
+            <li>«include» und «extend» verwechseln — include ist Pflicht, extend ist optional.</li>
+          </ul>
+        </div>
+
+        <h3>Notations-Spickzettel — alle Symbole auf einen Blick</h3>
+        <table class="grim">
+          <tr><th>Symbol</th><th>Bedeutung</th><th>Diagrammtyp</th></tr>
+          <tr><td>Rechteck, 3 Fächer</td><td>Klasse (Name/Attribute/Methoden)</td><td>Klassendiagramm</td></tr>
+          <tr><td>leere Raute</td><td>Aggregation</td><td>Klassendiagramm</td></tr>
+          <tr><td>gefüllte Raute</td><td>Komposition</td><td>Klassendiagramm</td></tr>
+          <tr><td>leeres Dreieck, durchgezogen</td><td>Vererbung/Generalisierung</td><td>Klassendiagramm, Use-Case</td></tr>
+          <tr><td>leeres Dreieck, gestrichelt</td><td>Realisierung (Interface)</td><td>Klassendiagramm</td></tr>
+          <tr><td>offener Pfeil, gestrichelt</td><td>Abhängigkeit</td><td>Klassendiagramm</td></tr>
+          <tr><td>Strichmännchen</td><td>Akteur</td><td>Use-Case-Diagramm</td></tr>
+          <tr><td>Ellipse</td><td>Use Case</td><td>Use-Case-Diagramm</td></tr>
+          <tr><td>gestrichelte vertikale Linie</td><td>Lebenslinie</td><td>Sequenzdiagramm</td></tr>
+          <tr><td>schmales Rechteck auf Lebenslinie</td><td>Aktivierungsbalken</td><td>Sequenzdiagramm</td></tr>
+          <tr><td>gefüllter Kreis / Kreis mit Ring</td><td>Start-/Endknoten</td><td>Aktivitäts-, Zustandsdiagramm</td></tr>
+          <tr><td>Raute (spitz)</td><td>Entscheidung</td><td>Aktivitätsdiagramm</td></tr>
+          <tr><td>dicker schwarzer Balken</td><td>Gabelung/Zusammenführung</td><td>Aktivitätsdiagramm</td></tr>
+          <tr><td>abgerundetes Rechteck</td><td>Zustand</td><td>Zustandsdiagramm</td></tr>
+        </table>
+
+        <h3>Lerntipps für die Prüfungsvorbereitung</h3>
+        <ul>
+          <li><strong>Symbole aktiv zeichnen, nicht nur erkennen</strong> — in der Prüfung musst du Diagramme selbst produzieren, nicht nur Multiple-Choice-Fragen beantworten.</li>
+          <li><strong>Vom Fließtext zur Notation üben</strong>: Nimm dir kurze Fachtexte (wie in Kapitel IV) und übersetze sie in Klassen, Beziehungen und Multiplizitäten.</li>
+          <li><strong>Pfeilrichtungen laut mitsprechen</strong>: „Die Raute sitzt am Ganzen“, „Der Pfeil der Vererbung zeigt nach oben zur Oberklasse“ — feste Merksätze verhindern Verwechslungen unter Zeitdruck.</li>
+          <li><strong>Zeitmanagement in der Prüfung</strong>: Lies die Aufgabenstellung zweimal, bevor du zeichnest — welches Diagramm ist überhaupt gefragt? Das entscheidet über die halbe Punktzahl.</li>
+        </ul>
+
+        <p style="margin-top:24px; font-style:italic;">Du hast alle Kapitel durchwandert. Nun warten die drei Prüfungen des Wissens im Register links — für die optimale Vorbereitung lohnt es sich, jede davon so lange zu wiederholen, bis sie vollständig bestanden ist.</p>
+        <button class="nextbtn" data-goto="quiz">Zur ersten Prüfung: Quiz →</button>
+      </section>
+
+      <!-- ===================== QUIZ ===================== -->
+      <section class="chapter" id="quiz">
+        <div class="chapter-eyebrow">Prüfung I</div>
+        <h2>Quiz des Wissens</h2>
+        <p class="sub">Beantworte alle Fragen richtig, um die Prüfung zu bestehen. Bei jedem Fehlversuch werden die Antworten neu gemischt.</p>
+
+        <div class="status-row">
+          <span class="pill" id="quizProgress">0 von 12 beantwortet</span>
+        </div>
+
+        <div id="quizContainer"></div>
+
+        <div class="actionbar">
+          <button class="btn" id="quizCheckBtn">Prüfung ablegen</button>
+          <button class="btn secondary" id="quizResetBtn">Neu mischen</button>
+        </div>
+        <div class="feedback" id="quizFeedback"></div>
+      </section>
+
+      <!-- ===================== LÜCKENTEXT ===================== -->
+      <section class="chapter" id="fill">
+        <div class="chapter-eyebrow">Prüfung II</div>
+        <h2>Der Lückentext-Bann</h2>
+        <p class="sub">Fülle alle Lücken korrekt aus. Nach 3 Fehlversuchen erscheinen Hinweise, ab dem 4. Fehlversuch kannst du dir die Lösung anzeigen lassen.</p>
+
+        <div class="status-row">
+          <span class="pill attempts" id="fillAttempts">0 Fehlversuche</span>
+        </div>
+
+        <p class="fill-text" id="fillText"></p>
+
+        <div class="actionbar">
+          <button class="btn" id="fillCheckBtn">Bann prüfen</button>
+          <button class="btn hint" id="fillHintBtn" style="display:none;">Hinweise anzeigen</button>
+          <button class="btn solution" id="fillSolutionBtn" style="display:none;">Lösung anzeigen</button>
+        </div>
+        <div class="feedback" id="fillFeedback"></div>
+      </section>
+
+      <!-- ===================== KREUZWORTRÄTSEL ===================== -->
+      <section class="chapter" id="cross">
+        <div class="chapter-eyebrow">Prüfung III</div>
+        <h2>Das Kreuzworträtsel-Siegel</h2>
+        <p class="sub">Löse alle Wörter korrekt. Nach 3 Fehlversuchen erscheinen Hinweise, ab dem 4. Fehlversuch kannst du dir die Lösung anzeigen lassen.</p>
+
+        <div class="status-row">
+          <span class="pill attempts" id="crossAttempts">0 Fehlversuche</span>
+        </div>
+
+        <div class="cross-wrap">
+          <div style="overflow-x:auto;"><table id="crossgrid"></table></div>
+          <div class="clues">
+            <h4>Waagerecht</h4>
+            <ol id="cluesAcross"></ol>
+            <h4>Senkrecht</h4>
+            <ol id="cluesDown"></ol>
+          </div>
+        </div>
+
+        <div class="actionbar">
+          <button class="btn" id="crossCheckBtn">Siegel prüfen</button>
+          <button class="btn hint" id="crossHintBtn" style="display:none;">Hinweise anzeigen</button>
+          <button class="btn solution" id="crossSolutionBtn" style="display:none;">Lösung anzeigen</button>
+        </div>
+        <div class="feedback" id="crossFeedback"></div>
+      </section>
+
+      <footer class="merk">Merke: Ein Diagramm, das niemand außer dir versteht, ist keine Dokumentation — nur eine private Zeichnung.</footer>
+    </div>
+  </div>
+</div>
+
+<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#2b1c10"/>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+/* =========================================================
+   NAVIGATION
+========================================================= */
+const tocButtons = document.querySelectorAll('.toc-btn');
+const chapters = document.querySelectorAll('.chapter');
+function showChapter(id){
+  chapters.forEach(c => c.classList.toggle('active', c.id === id));
+  tocButtons.forEach(b => b.classList.toggle('active', b.dataset.ch === id));
+  document.getElementById('pageArea').scrollTo({top:0, behavior:'smooth'});
+}
+tocButtons.forEach(b => b.addEventListener('click', () => showChapter(b.dataset.ch)));
+document.querySelectorAll('[data-goto]').forEach(b=>{
+  b.addEventListener('click', ()=> showChapter(b.dataset.goto));
+});
+showChapter('ch0');
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+/* =========================================================
+   QUIZ
+========================================================= */
+const quizData = [
+  {q:"Wofür steht die Abkürzung UML?", options:["Universal Markup Language","Unified Modeling Language","United Model Logic","Unified Machine Language"], correct:1},
+  {q:"Welche Organisation standardisiert UML?", options:["W3C","ISO","IHK","OMG (Object Management Group)"], correct:3},
+  {q:"Zu welcher Diagrammfamilie gehört das Klassendiagramm?", options:["Verhaltensdiagramm","Strukturdiagramm","Interaktionsdiagramm","Prozessdiagramm"], correct:1},
+  {q:"Welches Symbol kennzeichnet die Sichtbarkeit „private“?", options:["+","#","-","~"], correct:2},
+  {q:"Wofür steht eine gefüllte Raute an einer Verbindungslinie?", options:["Aggregation","Vererbung","Komposition","Assoziation"], correct:2},
+  {q:"Wofür steht eine leere (unausgefüllte) Raute?", options:["Komposition","Realisierung","Abhängigkeit","Aggregation"], correct:3},
+  {q:"Wie wird Vererbung im Klassendiagramm dargestellt?", options:["Gestrichelte Linie mit offenem Pfeil","Durchgezogene Linie mit leerem, geschlossenem Dreieckspfeil zur Oberklasse","Linie mit gefüllter Raute","Punktierte Linie ohne Pfeil"], correct:1},
+  {q:"Was zeigt ein Use-Case-Diagramm hauptsächlich?", options:["Den Quellcode einer Klasse","Funktionale Anforderungen aus Nutzersicht","Den zeitlichen Ablauf von Methodenaufrufen","Die Datenbankstruktur"], correct:1},
+  {q:"Was bedeutet «include» zwischen zwei Use Cases?", options:["Der eingebundene Use Case ist rein optional","Der eingebundene Use Case wird immer mit ausgeführt","Beide Use Cases schließen sich gegenseitig aus","Es besteht eine Vererbungsbeziehung"], correct:1},
+  {q:"Was stellt eine Lebenslinie im Sequenzdiagramm dar?", options:["Eine Datenbanktabelle","Einen Use Case","Ein Objekt über die Zeit hinweg","Eine Bedingung"], correct:2},
+  {q:"Welches Element zeigt im Aktivitätsdiagramm eine parallele Ausführung an?", options:["Die Entscheidungsraute","Der Startknoten","Gabelung/Zusammenführung (Fork/Join)","Die Schwimmbahn"], correct:2},
+  {q:"Wofür eignet sich ein Zustandsdiagramm am besten?", options:["Um die Datenbankstruktur zu zeigen","Um den Lebenszyklus eines einzelnen Objekts abzubilden","Um Klassenbeziehungen zu zeigen","Um Anforderungen zu sammeln"], correct:2},
+];
+
+let quizOrder = [];
+function buildQuiz(){
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+  quizOrder = quizData.map((q,i)=>{
+    const opts = q.options.map((text,origIdx)=>({text, origIdx}));
+    return {...q, shuffled: shuffle(opts)};
+  });
+  quizOrder.forEach((q, qi)=>{
+    const block = document.createElement('div');
+    block.className = 'q-block';
+    block.dataset.qi = qi;
+    const title = document.createElement('div');
+    title.className = 'q-title';
+    title.textContent = (qi+1) + '. ' + q.q;
+    block.appendChild(title);
+    const optWrap = document.createElement('div');
+    optWrap.className = 'q-options';
+    q.shuffled.forEach((opt, oi)=>{
+      const label = document.createElement('label');
+      label.className = 'q-option';
+      label.innerHTML = '<input type="radio" name="q'+qi+'" value="'+oi+'"> <span>'+opt.text+'</span>';
+      label.addEventListener('click', ()=>{
+        optWrap.querySelectorAll('.q-option').forEach(o=>o.classList.remove('selected'));
+        label.classList.add('selected');
+        updateQuizProgress();
+      });
+      optWrap.appendChild(label);
+    });
+    block.appendChild(optWrap);
+    container.appendChild(block);
+  });
+  document.getElementById('quizFeedback').textContent = '';
+  document.getElementById('quizFeedback').className = 'feedback';
+  updateQuizProgress();
+}
+function updateQuizProgress(){
+  const answered = document.querySelectorAll('.q-block input[type=radio]:checked').length;
+  document.getElementById('quizProgress').textContent = answered + ' von ' + quizData.length + ' beantwortet';
+}
+document.getElementById('quizResetBtn').addEventListener('click', buildQuiz);
+document.getElementById('quizCheckBtn').addEventListener('click', ()=>{
+  let allCorrect = true;
+  let correctCount = 0;
+  const wrongNumbers = [];
+  document.querySelectorAll('.q-block').forEach(block=>{
+    const qi = +block.dataset.qi;
+    const q = quizOrder[qi];
+    const checked = block.querySelector('input[type=radio]:checked');
+    const opts = block.querySelectorAll('.q-option');
+    opts.forEach(o=>{ o.classList.remove('correct','incorrect'); });
+    const correctShuffledIdx = q.shuffled.findIndex(o => o.origIdx === q.correct);
+    if(!checked){
+      allCorrect = false;
+      wrongNumbers.push((qi+1) + ' (unbeantwortet)');
+      opts[correctShuffledIdx].classList.add('correct');
+      return;
+    }
+    const chosenShuffledIdx = +checked.value;
+    const isCorrect = q.shuffled[chosenShuffledIdx].origIdx === q.correct;
+    if(isCorrect){
+      correctCount++;
+      opts[chosenShuffledIdx].classList.add('correct');
+    } else {
+      allCorrect = false;
+      wrongNumbers.push(String(qi+1));
+      opts[chosenShuffledIdx].classList.add('incorrect');
+      opts[correctShuffledIdx].classList.add('correct');
+    }
+  });
+  const fb = document.getElementById('quizFeedback');
+  const checkBtn = document.getElementById('quizCheckBtn');
+  if(allCorrect){
+    fb.textContent = 'Bestanden! ' + correctCount + ' von ' + quizData.length + ' richtig — das Quiz-Siegel ist dein.';
+    fb.className = 'feedback ok';
+    document.getElementById('sealQuiz').textContent = '🔒✓';
+  } else {
+    fb.innerHTML = correctCount + ' von ' + quizData.length + ' richtig. <strong>Falsch bzw. offen: Frage ' + wrongNumbers.join(', ') + '.</strong> Deine Auswahl ist rot markiert, die richtige Antwort grün. Die Fragen werden gleich neu gemischt — dann nochmal vollständig durchgehen.';
+    fb.className = 'feedback bad';
+    checkBtn.disabled = true;
+    setTimeout(()=>{ buildQuiz(); checkBtn.disabled = false; }, 4000);
+  }
+});
+buildQuiz();
+
+/* =========================================================
+   LÜCKENTEXT
+========================================================= */
+const fillAnswers = ["unified modeling language","omg","struktur","verhaltens","public","komposition","akteure","lebenslinien","zustands","kommunikation"];
+const fillTemplate = `UML steht für {0} und wird von der {1} standardisiert. Man unterscheidet zwischen {2}diagrammen, die den statischen Aufbau zeigen, und {3}diagrammen, die dynamische Abläufe darstellen. Im Klassendiagramm kennzeichnet das Pluszeichen die Sichtbarkeit {4}, während eine gefüllte Raute eine {5} darstellt. Beim Use-Case-Diagramm interagieren {6} mit dem System, das Sequenzdiagramm zeigt den zeitlichen Ablauf über sogenannte {7}, und das {8}diagramm eignet sich besonders gut, um den Lebenszyklus eines einzelnen Objekts abzubilden. Insgesamt hilft UML dabei, die {9} im Team zu verbessern, noch vor der Programmierung Fehler zu erkennen und Software verständlich zu dokumentieren.`;
+
+let fillAttempts = 0;
+function buildFill(){
+  let html = fillTemplate;
+  fillAnswers.forEach((ans, i)=>{
+    html = html.replace('{'+i+'}', '<input type="text" data-idx="'+i+'" autocomplete="off">');
+  });
+  document.getElementById('fillText').innerHTML = html;
+  fillAttempts = 0;
+  document.getElementById('fillAttempts').textContent = '0 Fehlversuche';
+  document.getElementById('fillHintBtn').style.display = 'none';
+  document.getElementById('fillSolutionBtn').style.display = 'none';
+  document.getElementById('fillFeedback').textContent = '';
+  document.getElementById('fillFeedback').className = 'feedback';
+}
+document.getElementById('fillCheckBtn').addEventListener('click', ()=>{
+  const inputs = document.querySelectorAll('#fillText input');
+  let allCorrect = true;
+  const wrongNumbers = [];
+  inputs.forEach(inp=>{
+    const idx = +inp.dataset.idx;
+    const val = inp.value.trim().toLowerCase();
+    const correct = val === fillAnswers[idx];
+    inp.classList.toggle('ok', correct);
+    inp.classList.toggle('bad', !correct);
+    if(!correct){ allCorrect = false; wrongNumbers.push(idx+1); }
+  });
+  const fb = document.getElementById('fillFeedback');
+  if(allCorrect){
+    fb.textContent = 'Der Bann ist gebrochen — alle Lücken korrekt!';
+    fb.className = 'feedback ok';
+    document.getElementById('sealFill').textContent = '🔒✓';
+    document.getElementById('fillHintBtn').style.display = 'none';
+    document.getElementById('fillSolutionBtn').style.display = 'none';
+  } else {
+    fillAttempts++;
+    document.getElementById('fillAttempts').textContent = fillAttempts + ' Fehlversuche';
+    fb.innerHTML = '<strong>Falsch: Lücke Nr. ' + wrongNumbers.join(', ') + '</strong> (rot markiert). Korrigiere sie und prüfe erneut.';
+    fb.className = 'feedback bad';
+    if(fillAttempts >= 3){ document.getElementById('fillHintBtn').style.display = 'inline-block'; }
+    if(fillAttempts >= 4){ document.getElementById('fillSolutionBtn').style.display = 'inline-block'; }
+  }
+});
+document.getElementById('fillHintBtn').addEventListener('click', ()=>{
+  document.querySelectorAll('#fillText input').forEach(inp=>{
+    if(!inp.classList.contains('ok')){
+      const idx = +inp.dataset.idx;
+      const ans = fillAnswers[idx];
+      inp.placeholder = ans[0].toUpperCase() + '… (' + ans.length + ' Zeichen)';
+    }
+  });
+});
+document.getElementById('fillSolutionBtn').addEventListener('click', ()=>{
+  document.querySelectorAll('#fillText input').forEach(inp=>{
+    const idx = +inp.dataset.idx;
+    inp.value = fillAnswers[idx].replace(/\b\w/g, c=>c.toUpperCase());
+    inp.classList.add('ok'); inp.classList.remove('bad');
+  });
+});
+buildFill();
+
+/* =========================================================
+   KREUZWORTRÄTSEL
+========================================================= */
+const crossWords = [
+  {word:"AKTEUR", clue:"Rolle oder System, das mit dem System interagiert (Use-Case-Diagramm)"},
+  {word:"KLASSE", clue:"Bauplan für Objekte mit Attributen und Methoden"},
+  {word:"VERERBUNG", clue:"Beziehung, bei der eine Unterklasse Eigenschaften der Oberklasse übernimmt"},
+  {word:"AGGREGATION", clue:"Schwache Ganzes-Teil-Beziehung mit leerer Raute"},
+  {word:"KOMPOSITION", clue:"Starke Ganzes-Teil-Beziehung mit gefüllter Raute"},
+  {word:"ZUSTAND", clue:"Momentaufnahme eines Objekts im Zustandsdiagramm"},
+  {word:"SEQUENZ", clue:"Diagrammtyp, der den zeitlichen Ablauf von Nachrichten zeigt"},
+  {word:"METHODE", clue:"Verhalten einer Klasse, auch Operation genannt"},
+  {word:"ATTRIBUT", clue:"Eigenschaft einer Klasse, z. B. Name oder Farbe"},
+  {word:"NACHRICHT", clue:"Wird im Sequenzdiagramm zwischen Lebenslinien ausgetauscht"},
+];
+
+function buildCrosswordLayout(words){
+  const sorted = [...words].sort((a,b)=>b.word.length-a.word.length);
+  const grid = new Map(); // "r,c" -> letter
+  const placed = [];
+
+  function canPlace(word, dir, row, col){
+    for(let k=0;k<word.length;k++){
+      const r = dir==='V' ? row+k : row;
+      const c = dir==='H' ? col+k : col;
+      const key = r+','+c;
+      if(grid.has(key) && grid.get(key) !== word[k]) return false;
+    }
+    const br = dir==='V' ? row-1 : row, bc = dir==='H' ? col-1 : col;
+    const er = dir==='V' ? row+word.length : row, ec = dir==='H' ? col+word.length : col;
+    if(grid.has(br+','+bc)) return false;
+    if(grid.has(er+','+ec)) return false;
+    return true;
+  }
+  function countIntersections(word, dir, row, col){
+    let n = 0;
+    for(let k=0;k<word.length;k++){
+      const r = dir==='V' ? row+k : row;
+      const c = dir==='H' ? col+k : col;
+      if(grid.has(r+','+c)) n++;
+    }
+    return n;
+  }
+  function commit(word, dir, row, col){
+    for(let k=0;k<word.length;k++){
+      const r = dir==='V' ? row+k : row;
+      const c = dir==='H' ? col+k : col;
+      grid.set(r+','+c, word[k]);
+    }
+  }
+
+  // first word horizontal
+  const w0 = sorted[0];
+  commit(w0.word, 'H', 0, 0);
+  placed.push({...w0, dir:'H', row:0, col:0});
+
+  for(let i=1;i<sorted.length;i++){
+    const w = sorted[i];
+    let best = null, bestScore = -1;
+    for(const p of placed){
+      for(let pi=0; pi<p.word.length; pi++){
+        for(let wi=0; wi<w.word.length; wi++){
+          if(p.word[pi] !== w.word[wi]) continue;
+          let cand;
+          if(p.dir === 'H'){
+            cand = {dir:'V', row: p.row - wi, col: p.col + pi};
+          } else {
+            cand = {dir:'H', row: p.row + wi, col: p.col - pi};
+          }
+          if(canPlace(w.word, cand.dir, cand.row, cand.col)){
+            const score = countIntersections(w.word, cand.dir, cand.row, cand.col);
+            if(score > bestScore){ bestScore = score; best = cand; }
+          }
+        }
+      }
+    }
+    if(best){
+      commit(w.word, best.dir, best.row, best.col);
+      placed.push({...w, dir:best.dir, row:best.row, col:best.col});
+    } else {
+      let maxRow = 0;
+      placed.forEach(p=>{
+        const end = p.dir==='V' ? p.row + p.word.length : p.row;
+        if(end > maxRow) maxRow = end;
+      });
+      const row = maxRow + 2, col = 0;
+      commit(w.word, 'H', row, col);
+      placed.push({...w, dir:'H', row, col});
+    }
+  }
+
+  // normalize
+  let minRow = Infinity, minCol = Infinity, maxRow = -Infinity, maxCol = -Infinity;
+  placed.forEach(p=>{
+    const endRow = p.dir==='V' ? p.row + p.word.length - 1 : p.row;
+    const endCol = p.dir==='H' ? p.col + p.word.length - 1 : p.col;
+    minRow = Math.min(minRow, p.row); maxRow = Math.max(maxRow, endRow);
+    minCol = Math.min(minCol, p.col); maxCol = Math.max(maxCol, endCol);
+  });
+  placed.forEach(p=>{ p.row -= minRow; p.col -= minCol; });
+
+  const rows = maxRow - minRow + 1, cols = maxCol - minCol + 1;
+  return {placed, rows, cols};
+}
+
+const cwLayout = buildCrosswordLayout(crossWords);
+let crossAttempts = 0;
+
+function renderCrossword(){
+  const {placed, rows, cols} = cwLayout;
+  const cellMap = {}; // "r,c" -> {letter, number}
+  placed.forEach(p=>{
+    for(let k=0;k<p.word.length;k++){
+      const r = p.dir==='V' ? p.row+k : p.row;
+      const c = p.dir==='H' ? p.col+k : p.col;
+      const key = r+','+c;
+      if(!cellMap[key]) cellMap[key] = {letter:p.word[k]};
+    }
+  });
+  // numbering
+  let counter = 1;
+  const numberAt = {};
+  window._cwNumberAt = numberAt;
+  window._cwPlaced = placed;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const key = r+','+c;
+      if(!cellMap[key]) continue;
+      const startsAcross = cellMap[key] && !cellMap[(r)+','+(c-1)] && cellMap[(r)+','+(c+1)];
+      const startsDown = cellMap[key] && !cellMap[(r-1)+','+(c)] && cellMap[(r+1)+','+(c)];
+      if(startsAcross || startsDown){
+        numberAt[key] = counter++;
+      }
+    }
+  }
+
+  const table = document.getElementById('crossgrid');
+  table.innerHTML = '';
+  for(let r=0;r<rows;r++){
+    const tr = document.createElement('tr');
+    for(let c=0;c<cols;c++){
+      const td = document.createElement('td');
+      const key = r+','+c;
+      if(cellMap[key]){
+        const wrap = document.createElement('div');
+        wrap.className = 'cw-cell';
+        if(numberAt[key]){
+          const num = document.createElement('span');
+          num.className = 'cw-num';
+          num.textContent = numberAt[key];
+          wrap.appendChild(num);
+        }
+        const input = document.createElement('input');
+        input.maxLength = 1;
+        input.dataset.r = r; input.dataset.c = c;
+        input.dataset.letter = cellMap[key].letter;
+        input.addEventListener('input', (e)=>{
+          e.target.value = e.target.value.toUpperCase().slice(0,1);
+        });
+        wrap.appendChild(input);
+        td.appendChild(wrap);
+      } else {
+        td.className = 'cw-empty';
+      }
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+
+  // clues
+  const across = document.getElementById('cluesAcross');
+  const down = document.getElementById('cluesDown');
+  across.innerHTML = ''; down.innerHTML = '';
+  const sortedByPos = [...placed].sort((a,b)=> (a.row-b.row) || (a.col-b.col));
+  sortedByPos.forEach(p=>{
+    const key = p.row+','+p.col;
+    const num = numberAt[key];
+    const li = document.createElement('li');
+    li.textContent = num + '. ' + p.clue + ' (' + p.word.length + ')';
+    (p.dir === 'H' ? across : down).appendChild(li);
+  });
+
+  crossAttempts = 0;
+  document.getElementById('crossAttempts').textContent = '0 Fehlversuche';
+  document.getElementById('crossHintBtn').style.display = 'none';
+  document.getElementById('crossSolutionBtn').style.display = 'none';
+  document.getElementById('crossFeedback').textContent = '';
+  document.getElementById('crossFeedback').className = 'feedback';
+}
+renderCrossword();
+
+document.getElementById('crossCheckBtn').addEventListener('click', ()=>{
+  const inputs = document.querySelectorAll('#crossgrid input');
+  let allCorrect = true;
+  inputs.forEach(inp=>{
+    const val = (inp.value || '').toUpperCase();
+    const correct = val === inp.dataset.letter;
+    inp.classList.toggle('ok', correct);
+    inp.classList.toggle('bad', !correct && val !== '');
+    if(!correct) allCorrect = false;
+  });
+  const fb = document.getElementById('crossFeedback');
+  if(allCorrect){
+    fb.textContent = 'Das Siegel ist gebrochen — das Kreuzworträtsel ist vollständig gelöst!';
+    fb.className = 'feedback ok';
+    document.getElementById('sealCross').textContent = '🔒✓';
+    document.getElementById('crossHintBtn').style.display = 'none';
+    document.getElementById('crossSolutionBtn').style.display = 'none';
+  } else {
+    crossAttempts++;
+    document.getElementById('crossAttempts').textContent = crossAttempts + ' Fehlversuche';
+    // welche Wörter enthalten mindestens ein falsches Feld?
+    const numberAt = window._cwNumberAt, placed = window._cwPlaced;
+    const wrongWords = [];
+    placed.forEach(p=>{
+      let hasWrong = false;
+      for(let k=0;k<p.word.length;k++){
+        const r = p.dir==='V' ? p.row+k : p.row;
+        const c = p.dir==='H' ? p.col+k : p.col;
+        const inp = document.querySelector('#crossgrid input[data-r="'+r+'"][data-c="'+c+'"]');
+        if(inp && !inp.classList.contains('ok')) hasWrong = true;
+      }
+      if(hasWrong){
+        const num = numberAt[p.row+','+p.col];
+        wrongWords.push(num + ' ' + (p.dir==='H' ? 'waagerecht' : 'senkrecht'));
+      }
+    });
+    fb.innerHTML = 'Noch nicht vollständig gelöst. <strong>Fehlerhaft: ' + wrongWords.join(', ') + '</strong> (rote Felder).';
+    fb.className = 'feedback bad';
+    if(crossAttempts >= 3){ document.getElementById('crossHintBtn').style.display = 'inline-block'; }
+    if(crossAttempts >= 4){ document.getElementById('crossSolutionBtn').style.display = 'inline-block'; }
+  }
+});
+document.getElementById('crossHintBtn').addEventListener('click', ()=>{
+  document.querySelectorAll('#crossgrid input').forEach(inp=>{
+    if(!inp.classList.contains('ok') && !inp.value){
+      inp.placeholder = inp.dataset.letter;
+    }
+  });
+});
+document.getElementById('crossSolutionBtn').addEventListener('click', ()=>{
+  document.querySelectorAll('#crossgrid input').forEach(inp=>{
+    inp.value = inp.dataset.letter;
+    inp.classList.add('ok'); inp.classList.remove('bad');
+  });
+});
+</script>
+</body>
+</html>
